@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Private Chat Room</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .chat-container {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      width: 350px;
+      height: 500px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-header {
+      background-color: #4CAF50;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      border-radius: 10px 10px 0 0;
+    }
+
+    .messages {
+      flex-grow: 1;
+      padding: 10px;
+      overflow-y: scroll;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .message {
+      padding: 8px;
+      margin: 5px 0;
+      border-radius: 5px;
+    }
+
+    .sent {
+      align-self: flex-end;
+      background-color: #e1ffc7;
+    }
+
+    .received {
+      align-self: flex-start;
+      background-color: #f1f1f1;
+    }
+
+    .chat-input-container {
+      display: flex;
+      padding: 10px;
+      background-color: #f9f9f9;
+      border-radius: 0 0 10px 10px;
+    }
+
+    .chat-input {
+      flex-grow: 1;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+      margin-right: 10px;
+    }
+
+    .send-button {
+      padding: 10px 15px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .send-button:hover {
+      background-color: #45a049;
+    }
+
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .login-form input {
+      padding: 10px;
+      margin: 10px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+
+    .login-form button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .login-form button:hover {
+      background-color: #45a049;
+    }
+
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <div id="loginScreen" class="login-form">
+    <h2>Enter your name</h2>
+    <input type="text" id="username" placeholder="Enter your name">
+    <button onclick="startChat()">Start Chat</button>
+  </div>
+
+  <div id="chatScreen" class="chat-container" style="display: none;">
+    <div class="chat-header">Private Chat Room</div>
+    <div id="messages" class="messages"></div>
+    <div class="chat-input-container">
+      <input type="text" id="messageInput" class="chat-input" placeholder="Type a message">
+      <button class="send-button" onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let username;
+  let messages = JSON.parse(localStorage.getItem('messages')) || [];
+
+  function startChat() {
+    username = document.getElementById('username').value;
+    if (username.trim()) {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('chatScreen').style.display = 'flex';
+      loadMessages();
+    } else {
+      alert('Please enter a valid name!');
+    }
+  }
+
+  function loadMessages() {
+    const messagesContainer = document.getElementById('messages');
+    messagesContainer.innerHTML = '';
+    messages.forEach(message => {
+      const messageElement = document.createElement('div');
+      messageElement.classList.add('message');
+      messageElement.classList.add(message.sender === username ? 'sent' : 'received');
+      messageElement.textContent = `${message.sender}: ${message.text}`;
+      messagesContainer.appendChild(messageElement);
+    });
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;  // Auto scroll to the bottom
+  }
+
+  function sendMessage() {
+    const messageInput = document.getElementById('messageInput');
+    const messageText = messageInput.value.trim();
+    if (messageText) {
+      const newMessage = {
+        sender: username,
+        text: messageText
+      };
+      messages.push(newMessage);
+      localStorage.setItem('messages', JSON.stringify(messages));  // Save messages in localStorage
+      loadMessages();
+      messageInput.value = '';  // Clear the input
+    }
+  }
+</script>
+
+</body>
+</html>
